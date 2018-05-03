@@ -6,7 +6,6 @@ const setupTotal = (facts, opts={container:'#total'}) => {
   const g_total = d_total.group()
 
   const groups = g_total.all().map(d=>d.key)
-  l(groups)
   const filter = d3.set(groups)
 
   const container = d3.select(opts.container)
@@ -14,28 +13,24 @@ const setupTotal = (facts, opts={container:'#total'}) => {
     container.append('button').text(k).on('click', ()=>{
       filter.has(k) ? filter.remove(k) : filter.add(k)
       d_total.filterFunction(g=>filter.has(g+""))
-      dispatch.call('filterChanged', this, facts)
+      dispatch.call('filterChanged', {}, facts)
     })
   })
-  const quantities = g_total.all()
+  const total = g_total.all()
   const display = container.append('div')
 
-  piePlotter = new ClassPiePlotter({
+  const piePlotter = new ClassPiePlotter({
     groups,
     selector: '#total div'
   })
 
   const update = () =>{
-    console.log(quantities)
-    const data = quantities.reduce((acc, d)=>{
+    const data = total.reduce((acc, d)=>{
       acc[d.key] = d.value
       return acc;
     }, {})
-    // pt(quantities)
-    // display.text(JSON.stringify(quantities))
-    piePlotter.update(
-      data
-    )
+
+    piePlotter.update( data)
   };
   return { update }
 }
@@ -45,7 +40,6 @@ const setupQuantity = (facts, opts={container:'#quantity'}) => {
   const g_quantity = d_quantity.group()
 
   const groups = g_quantity.all().map(d=>d.key)
-  l(groups)
   const filter = d3.set(groups)
 
   const container = d3.select(opts.container)
@@ -53,15 +47,23 @@ const setupQuantity = (facts, opts={container:'#quantity'}) => {
     container.append('button').text(k).on('click', ()=>{
       filter.has(k) ? filter.remove(k) : filter.add(k)
       d_quantity.filterFunction(g=>filter.has(g+""))
-      dispatch.call('filterChanged', this, facts)
+      dispatch.call('filterChanged', {}, facts)
     })
   })
   const quantities = g_quantity.all()
   const display = container.append('div')
 
+  const piePlotter = new ClassPiePlotter({
+    groups,
+    selector: '#quantity div'
+  })
+
   const update = () =>{
-    pt(quantities)
-    display.text(JSON.stringify(quantities))
+    const data = quantities.reduce((acc, d)=>{
+      acc[d.key] = d.value
+      return acc;
+    }, {})
+    piePlotter.update( data)
   };
   return { update }
 }
@@ -75,7 +77,6 @@ const setupTable = (facts, opts={container:'#table'}) => {
   const displayArea = container.append('div')
 
   const update = () =>{
-    pt(table)
     displayArea.text(JSON.stringify(table))
   };
   return { update }
@@ -85,14 +86,14 @@ d3.json('./data.json', (er, data)=>{
   if (er) throw er;
   const facts = crossfilter(data)
 
-  dispatch.on('filterChanged.renderTable', () => {
-    const d_id = facts.dimension(d=>d.id)
-    const g_id = d_id.group()
-  })
-
   const table = setupTable(facts)
   dispatch.on('filterChanged.rendTable', () => {
     table.update()
+  })
+
+  const total = setupTotal(facts);
+  dispatch.on('filterChanged.renderTotal', () => {
+    total.update()
   })
 
   const quantity = setupQuantity(facts);
@@ -100,12 +101,7 @@ d3.json('./data.json', (er, data)=>{
     quantity.update()
   })
 
-  const total = setupTotal(facts);
-  dispatch.on('filterChanged.renderQuantity', () => {
-    total.update()
-  })
-
-  dispatch.call('filterChanged', this, facts)
+  dispatch.call('filterChanged', {}, facts)
 })
 
 
