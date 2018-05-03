@@ -20,9 +20,22 @@ const setupTotal = (facts, opts={container:'#total'}) => {
   const quantities = g_total.all()
   const display = container.append('div')
 
+  piePlotter = new ClassPiePlotter({
+    groups,
+    selector: '#total div'
+  })
+
   const update = () =>{
-    pt(quantities)
-    display.text(JSON.stringify(quantities))
+    console.log(quantities)
+    const data = quantities.reduce((acc, d)=>{
+      acc[d.key] = d.value
+      return acc;
+    }, {})
+    // pt(quantities)
+    // display.text(JSON.stringify(quantities))
+    piePlotter.update(
+      data
+    )
   };
   return { update }
 }
