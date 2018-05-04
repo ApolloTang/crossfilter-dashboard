@@ -1,27 +1,60 @@
 var dispatch = d3.dispatch('load', 'filterChanged');
 
 
-const setupTotal = (facts, opts={container:'#total'}) => {
-  const d_total = facts.dimension(d=>d.total)
-  const g_total = d_total.group()
+const setupPie = (facts, opts) => {
+  const dimension = facts.dimension(d=>d[opts.dimensionName])
+  const dimensionGroup = dimension.group()
 
-  const groups = g_total.all().map(d=>d.key)
-  const filter = d3.set(groups)
+  const groups = dimensionGroup.all().map(d=>d.key)
+  let filter = d3.set(groups)
 
   const container = d3.select(opts.container)
   groups.forEach(k=>{
     container.append('button').text(k).on('click', ()=>{
       filter.has(k) ? filter.remove(k) : filter.add(k)
-      d_total.filterFunction(g=>filter.has(g+""))
+      dimension.filterFunction(g=>filter.has(g+""))
       dispatch.call('filterChanged', {}, facts)
     })
   })
-  const total = g_total.all()
+  const total = dimensionGroup.all()
   const display = container.append('div')
+
+  console.log('xxxx initial filter', filter.values())
+  const onClickCallback = (datum, index, currentNode, d3SelectPaths) => {
+    const groupClicked = datum.data
+    if (filter.has(groupClicked)) {
+      if (filter.values().length === groups.length) {
+        filter.clear()
+        filter.add(groupClicked)
+        d3.select(currentNode).style('stroke', '#F00')
+      } else {
+        filter.remove(groupClicked)
+        d3.select(currentNode).style('stroke', null)
+      }
+      if (filter.values().length === 0) {
+        filter = d3.set(groups)
+      }
+    } else {
+      filter.add(groupClicked)
+      if (filter.values().length === groups.length) {
+        d3SelectPaths.style('stroke', null)
+      } else {
+        d3.select(currentNode).style('stroke', '#F00')
+      }
+    }
+    console.log('xxxx after click filter', filter.values())
+
+    dimension.filterFunction(g=>{
+      return filter.has(g+"")
+    })
+
+    dispatch.call('filterChanged', {}, facts)
+  }
 
   const piePlotter = new ClassPiePlotter({
     groups,
-    selector: '#total div'
+    selector: `${opts.container} div`,
+    onClickCallback
   })
 
   const update = () =>{
@@ -35,38 +68,6 @@ const setupTotal = (facts, opts={container:'#total'}) => {
   return { update }
 }
 
-const setupQuantity = (facts, opts={container:'#quantity'}) => {
-  const d_quantity = facts.dimension(d=>d.quantity)
-  const g_quantity = d_quantity.group()
-
-  const groups = g_quantity.all().map(d=>d.key)
-  const filter = d3.set(groups)
-
-  const container = d3.select(opts.container)
-  groups.forEach(k=>{
-    container.append('button').text(k).on('click', ()=>{
-      filter.has(k) ? filter.remove(k) : filter.add(k)
-      d_quantity.filterFunction(g=>filter.has(g+""))
-      dispatch.call('filterChanged', {}, facts)
-    })
-  })
-  const quantities = g_quantity.all()
-  const display = container.append('div')
-
-  const piePlotter = new ClassPiePlotter({
-    groups,
-    selector: '#quantity div'
-  })
-
-  const update = () =>{
-    const data = quantities.reduce((acc, d)=>{
-      acc[d.key] = d.value
-      return acc;
-    }, {})
-    piePlotter.update( data)
-  };
-  return { update }
-}
 
 const setupTable = (facts, opts={container:'#table'}) => {
   const d_table = facts.dimension(d=>d.id)
@@ -91,12 +92,18 @@ d3.json('./data.json', (er, data)=>{
     table.update()
   })
 
-  const total = setupTotal(facts);
+  const total = setupPie(facts, {
+    container:'#total',
+    dimensionName:'total'
+  });
   dispatch.on('filterChanged.renderTotal', () => {
     total.update()
   })
 
-  const quantity = setupQuantity(facts);
+  const quantity = setupPie(facts, {
+    container:'#quantity',
+    dimensionName:'quantity'
+  });
   dispatch.on('filterChanged.renderQuantity', () => {
     quantity.update()
   })
