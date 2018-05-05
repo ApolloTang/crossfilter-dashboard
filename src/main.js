@@ -1,5 +1,24 @@
+import ClassPiePlotter  from './ClassPiePlotter.js'
+import ClassTimeSeriesPlotter from './ClassTimeSeriesPlotter.js'
+
+
 var dispatch = d3.dispatch('load', 'filterChanged');
 
+
+const setupTable = (facts, opts={container:'#table'}) => {
+  const d_table = facts.dimension(d=>d.id)
+  const g_table = d_table.group()
+
+  const container = d3.select(opts.container)
+  const table = d_table.top(Infinity)
+  const displayArea = container.append('div')
+
+  const update = () =>{
+    console.table(d_table.top(Infinity))
+    displayArea.text(JSON.stringify(table))
+  };
+  return { update }
+}
 
 const setupPie = (facts, opts) => {
   const dimension = facts.dimension(d=>d[opts.dimensionName])
@@ -69,26 +88,46 @@ const setupPie = (facts, opts) => {
 }
 
 
-const setupTable = (facts, opts={container:'#table'}) => {
-  const d_table = facts.dimension(d=>d.id)
-  const g_table = d_table.group()
+const setupTimeSeries = (facts, opts) => {
+  const dimension = facts.dimension(d=>d[opts.dimensionName])
+  const dimensionGroup = dimension.group()
+
+  const groups = dimensionGroup.all().map(d=>d.key)
+  let filter = d3.set(groups)
 
   const container = d3.select(opts.container)
-  const table = g_table.all()
-  const displayArea = container.append('div')
+  const displayArea = container.append('div').classed('chart', true)
+
+  const timeSeriesPlotter = new ClassTimeSeriesPlotter({
+    groups,
+    selector: `${opts.container} div.chart`,
+  })
 
   const update = () =>{
-    displayArea.text(JSON.stringify(table))
+    console.table(dimension.top(Infinity))
+    // displayArea.text(JSON.stringify(dimension.top(Infinity)))
   };
   return { update }
 }
 
+
 d3.json('./data.json', (er, data)=>{
   if (er) throw er;
+
+  data.forEach(d=>d.date = new Date(d.date))
+
   const facts = crossfilter(data)
 
+  const timeSeries = setupTimeSeries(facts, {
+    container:'#time-series',
+    dimensionName:'date'
+  });
+  dispatch.on('filterChanged.renderTimeSeries', () => {
+    timeSeries.update()
+  })
+
   const table = setupTable(facts)
-  dispatch.on('filterChanged.rendTable', () => {
+  dispatch.on('filterChanged.renderTable', () => {
     table.update()
   })
 

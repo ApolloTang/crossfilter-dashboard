@@ -23,6 +23,7 @@
     Chart has not being loaded
   </div>
 
+  <div id="time-series"></div>
   <div id="quantity"></div>
   <div id="total"></div>
   <div id="table"></div>
@@ -34,7 +35,7 @@
   <script src="http://localhost:9088/d3/d3.js"></script>
   <script src="http://localhost:9088/d3/d3-selection-multi.v1.js"></script>
   <script src="./data.js"></script>
-  <script src="./ClassPiePlotter.js" ></script>
+  <script src="./ClassTimeSeriesPlotter.js" ></script>
   <script>
     const chart = d3.select('.chart');
     chart.html(`
@@ -44,6 +45,6 @@
       crossfilter: version ${crossfilter.version} </br>
     `);
   </script>
-<script src="./main.js"></script>
+<script type="module" src="./main.js"></script>
 </body>
 </html>

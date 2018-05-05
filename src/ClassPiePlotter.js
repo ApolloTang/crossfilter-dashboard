@@ -1,4 +1,4 @@
-class ClassPiePlotter {
+export default class ClassPiePlotter {
   constructor({
     size, donutHoleSize,
     groups, selector, color,
