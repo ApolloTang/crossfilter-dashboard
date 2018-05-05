@@ -1,22 +1,10 @@
 <!DOCTYPE html>
 <head>
-<meta charset="utf-8">
-<title>Dashboard 1</title>
-<style type="text/less">
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {padding-top: 80px;}
-</style>
-<style>
-  .axis text {
-    font: 10px sans-serif;
-  }
-  .axis line,
-  .axis path {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-  }
-</style>
+  <meta charset="utf-8">
+  <title>Dashboard</title>
+  <style type="text/less">
+  </style>
+  <link rel="stylesheet/less" type="text/css" href="main.less">
 </head>
 <body>
   <div class="chart">
@@ -35,7 +23,6 @@
   <script src="http://localhost:9088/d3/d3.js"></script>
   <script src="http://localhost:9088/d3/d3-selection-multi.v1.js"></script>
   <script src="./data.js"></script>
-  <script src="./ClassTimeSeriesPlotter.js" ></script>
   <script>
     const chart = d3.select('.chart');
     chart.html(`
