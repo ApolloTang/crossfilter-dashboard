@@ -20,6 +20,7 @@ const setupTable = (facts, opts={container:'#table'}) => {
   return { update }
 }
 
+
 const setupPie = (facts, opts) => {
   const dimension = facts.dimension(d=>d[opts.dimensionName])
   const dimensionGroup = dimension.group()
@@ -92,23 +93,25 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   const container = d3.select(opts.container)
   const displayArea = container.append('div').classed('chart', true)
 
-  const dimension = facts.dimension(d=>d[opts.dimensionName])
-  const dimensionGroup = dimension.group()
+  const dimension = window.d_date = facts.dimension( d=>d.date )
 
   const onDateRangeChangeCallBack = filterRange => {
-    console.log('filterRange: ', filterRange)
-    dimension.filterRange(filterRange)
+    // _.debounce(()=>{
+      const filterRageInDateString = filterRange.map(d=>d.toISOString())
+      console.log('filterRange: ', filterRange, filterRageInDateString)
+      dimension.filterRange(filterRageInDateString)
+      dispatch.call('filterChanged', {}, facts)
+    // },300)
   }
 
-  const timeSeriesFilter = new ClassTimeSeriesFilter({
+  const _timeSeriesFilter = new ClassTimeSeriesFilter({
     data,
     selector: `${opts.container} div.chart`,
     onDateRangeChangeCallBack
   })
 
   const update = () =>{
-    console.table(dimension.top(Infinity))
-    // displayArea.text(JSON.stringify(dimension.top(Infinity)))
+    _timeSeriesFilter.update()
   };
   return { update }
 }
@@ -117,14 +120,23 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
 d3.json('./data.json', (er, data)=>{
   if (er) throw er;
 
-  data.forEach(d=>d.date = new Date(d.date))
+  const dateName = '_date'
+  data.forEach(d=>{
+    d[dateName] = new Date(d.date)
+    d.date = d[dateName].toISOString() // make sure date is in same formate as _date
+  })
 
   const facts = crossfilter(data)
 
   const timeSeriesfilter = setupTimeSeriesFilter(data, facts, {
     container:'#time-series',
-    dimensionName:'total'
+    dimensionName:'total',
+    dateName
   });
+  dispatch.on('filterChanged.renderTimeSeries', () => {
+     //* no need to update timeSeries
+     // timeSeriesfilter.update()
+  })
 
   const table = setupTable(facts)
   dispatch.on('filterChanged.renderTable', () => {

@@ -2,16 +2,15 @@ export default class ClassTimeSeriesPlotter {
   constructor({
     width, height,
     selector,
-    data, groups,
+    data, dateName,
     onDateRangeChangeCallBack
   }) {
     this.width_container = width || 600
     this.height_container = height || 200
-
-    this.data = data
-    this.groups = groups
-
     this.selector = selector
+
+    this.dateName = dateName || '_date'
+    this.data = data
 
     this.onDateRangeChangeCallBack = onDateRangeChangeCallBack || function(selectedDomain) { console.log(selectedDomain) }
 
@@ -20,7 +19,6 @@ export default class ClassTimeSeriesPlotter {
 
   _initPlot () {
     const that = this
-    const groups = this.groups
     const selector =this.selector
 
     this._setupStage()
@@ -29,7 +27,6 @@ export default class ClassTimeSeriesPlotter {
     this._drawAreaPlot(this.data)
 
     this._setupBrush()
-
   }
 
   _setupStage () {
@@ -62,9 +59,10 @@ export default class ClassTimeSeriesPlotter {
   }
 
   _calculateScales(data) {
+    const dateName = this.dateName
     this.x = d3.scaleTime()
       .range([0, this.width])
-      .domain(d3.extent(data, function(d) { return d.date }));
+      .domain(d3.extent(data, function(d) { return d[dateName] }));
 
     this.y = d3.scaleLinear()
       .range([this.height, 0])
@@ -72,9 +70,11 @@ export default class ClassTimeSeriesPlotter {
   }
 
   _drawAreaPlot(data) {
+    const dateName = this.dateName
+
     const area = window.area = d3.area()
       .curve(d3.curveMonotoneX)
-      .x(d=>this.x(d.date))
+      .x(d=>this.x(d[dateName]))
       .y0(this.height)
       .y1(d=>this.y(d.total))
 
@@ -109,6 +109,10 @@ export default class ClassTimeSeriesPlotter {
         self.onDateRangeChangeCallBack(selectedDomain)
       }
     }
+  }
+
+  update(data) {
+    // @TODO
   }
 
   destroy() {
