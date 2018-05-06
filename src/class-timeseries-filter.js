@@ -3,6 +3,7 @@ export default class ClassTimeSeriesPlotter {
     width, height,
     selector,
     data, groups,
+    onDateRangeChangeCallBack
   }) {
     this.width_container = width || 600
     this.height_container = height || 200
@@ -11,6 +12,8 @@ export default class ClassTimeSeriesPlotter {
     this.groups = groups
 
     this.selector = selector
+
+    this.onDateRangeChangeCallBack = onDateRangeChangeCallBack || function(selectedDomain) { console.log(selectedDomain) }
 
     this._initPlot()
   }
@@ -22,10 +25,10 @@ export default class ClassTimeSeriesPlotter {
 
     this._setupStage()
 
-    this._calculateScalesRange(this.data)
+    this._calculateScales(this.data)
     this._drawAreaPlot(this.data)
 
-    // this._setupFilter()
+    this._setupBrush()
 
   }
 
@@ -58,13 +61,7 @@ export default class ClassTimeSeriesPlotter {
       .attr('fill', 'hsla(0, 50%, 90%, .4)');
   }
 
-  _setupFilter() {
-    this.brush = d3.brushX()
-      .extent([[0, 0], [this.width, this.height]])
-      .on("brush end", this._handleBrushed);
-  }
-
-  _calculateScalesRange(data) {
+  _calculateScales(data) {
     this.x = d3.scaleTime()
       .range([0, this.width])
       .domain(d3.extent(data, function(d) { return d.date }));
@@ -88,18 +85,31 @@ export default class ClassTimeSeriesPlotter {
       .attr("d", area);
   }
 
-  _handleBrushed() {
-    // if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
-    // const s = d3.event.selection || this.width.range();
-    // x.domain(s.map(x2.invert, x2));
-    // focus.select(".area").attr("d", area);
-    // focus.select(".axis--x").call(xAxis);
-    // svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
-    //     .scale(width / (s[1] - s[0]))
-    //     .translate(-s[0], 0));
+  _setupBrush() {
+    const brush = this.brush = d3.brushX()
+      .extent([[0, 0], [this.width, this.height]])
+      .on("brush end", this._handleBrushed(this));
+
+    const originName = this.originName = 'brush brush__time-filter'
+
+    this.stage
+      .append("g")
+      .attr("class", originName)
+      .call(brush)
+      .call(brush.move, this.x.range());
   }
 
-
+  _handleBrushed(self) {
+    return (g) => {
+      const fullRange = self.x.range();
+      const selectedRange = d3.event.selection || fullRange
+      const originName = _.get(d3.event.sourceEvent, `path[1].className.baseVal`, void 0)
+      if (originName === self.originName) {
+        const selectedDomain = selectedRange.map(self.x.invert)
+        self.onDateRangeChangeCallBack(selectedDomain)
+      }
+    }
+  }
 
   destroy() {
     // @TODO

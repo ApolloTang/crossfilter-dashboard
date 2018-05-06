@@ -89,18 +89,21 @@ const setupPie = (facts, opts) => {
 
 
 const setupTimeSeriesFilter = (data, facts, opts) => {
+  const container = d3.select(opts.container)
+  const displayArea = container.append('div').classed('chart', true)
+
   const dimension = facts.dimension(d=>d[opts.dimensionName])
   const dimensionGroup = dimension.group()
 
-  const groups = dimensionGroup.all().map(d=>d.key)
-  let filter = d3.set(groups)
-
-  const container = d3.select(opts.container)
-  const displayArea = container.append('div').classed('chart', true)
+  const onDateRangeChangeCallBack = filterRange => {
+    console.log('filterRange: ', filterRange)
+    dimension.filterRange(filterRange)
+  }
 
   const timeSeriesFilter = new ClassTimeSeriesFilter({
     data,
     selector: `${opts.container} div.chart`,
+    onDateRangeChangeCallBack
   })
 
   const update = () =>{
@@ -120,6 +123,7 @@ d3.json('./data.json', (er, data)=>{
 
   const timeSeriesfilter = setupTimeSeriesFilter(data, facts, {
     container:'#time-series',
+    dimensionName:'total'
   });
 
   const table = setupTable(facts)
