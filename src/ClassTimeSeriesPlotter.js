@@ -1,11 +1,10 @@
 export default class ClassTimeSeriesPlotter {
   constructor({
-    width, aspectRatio,
+    width, height,
     groups, selector
   }) {
-    this.width = width || 600
-    this.aspectRatio = aspectRatio || 0.5
-    this.height = this.width * this.aspectRatio
+    this.width_container = width || 600
+    this.height_container = height || 350
     this.groups = groups
     this.selector = selector
 
@@ -14,34 +13,75 @@ export default class ClassTimeSeriesPlotter {
 
   _initPlot () {
     const that = this
-    const width = this.width
-    const height = this.height
     const groups = this.groups
     const selector =this.selector
 
+    this._setupStage()
+    this._calculateScalesRange()
+
+    // inject data from group
+    // this._calculateScalesDomain(this.group)
+  }
+
+  _setupStage () {
+    const margin         = this.margin         = {right: 20 ,left: 20}
+    const margin_focus   = this.margin_focus   = {top: 20   ,bottom: 150 }
+    const margin_context = this.margin_context = {top: 220  ,bottom: 20  }
     const svg = d3
-      .select(selector).append('svg')
+      .select(this.selector).append('svg')
+      .attr('width', this.width_container)
+      .attr('height', this.height_container)
+      .attr('style', 'outline: 1px solid red;')
+
+    const width          = this.width          = +svg.attr('width')  - margin.left       - margin.right
+    const height_focus   = this.height_focus   = +svg.attr('height') - margin_focus.top  - margin_focus.bottom
+    const height_context = this.height_context = +svg.attr('height') - margin_context.top - margin_context.bottom
+
+    svg.append('defs').append('clipPath')
+      .attr('id', 'clip')
+      .append('rect')
       .attr('width', width)
-      .attr('height', height)
+      .attr('height', height_focus);
 
-    const margin = {top: 20, right: 20, bottom: 30, left: 50}
-    const stage_w = +svg.attr("width") - margin.left - margin.right
-    const stage_h = +svg.attr("height") - margin.top - margin.bottom
-    const area = svg
-      .append("g")
-      .attr('transform', `translate(${margin.left}, ${margin.top})`)
+    this.stage_focus = svg.append('g')
+      .attr('class', 'focus')
+      .attr('transform', 'translate(' + margin.left + ',' + margin_focus.top + ')')
+      .append('rect')
+      .attr('class', 'plot-area-background')
+      .attr('width', width)
+      .attr('height', height_focus)
+      .attr('fill', 'blue');
 
-    const scale_x = d3.scaleTime().rangeRound([0, stage_w]);
-    const scale_y = d3.scaleLinear().rangeRound([stage_h, 0]);
-
+    this.stage_context = svg.append('g')
+      .attr('class', 'context')
+      .attr('transform', 'translate(' + margin.left + ',' + margin_context.top + ')')
+      .append('rect')
+      .attr('class', 'plot-area-background')
+      .attr('width', width)
+      .attr('height', height_context)
+      .attr('fill', 'red');
   }
 
-  _handleBruchChange(paths) {
-    // return (datum, index, nodes) => {
-    //   const currentPath = nodes[0]
-    //   this.onClickCallback(datum, index, currentPath, paths)
-    // }
+  _calculateScalesRange() {
+    this.x = d3.scaleTime().range([0, this.width]),
+    this.y_focus = d3.scaleLinear().range([this.height_focus, 0]),
+    this.y_context = d3.scaleLinear().range([this.height_context, 0]);
   }
+
+  _calculateScalesDomain() {
+  }
+
+  _handleBrushed() {
+    // if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+    // const s = d3.event.selection || this.width.range();
+    // x.domain(s.map(x2.invert, x2));
+    // focus.select(".area").attr("d", area);
+    // focus.select(".axis--x").call(xAxis);
+    // svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+    //     .scale(width / (s[1] - s[0]))
+    //     .translate(-s[0], 0));
+  }
+
 
   update(data) {
   }
