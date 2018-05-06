@@ -1,5 +1,5 @@
 import ClassPiePlotter  from './ClassPiePlotter.js'
-import ClassTimeSeriesPlotter from './ClassTimeSeriesPlotter.js'
+import ClassTimeSeriesFilter from './class-timeseries-filter.js'
 
 
 var dispatch = d3.dispatch('load', 'filterChanged');
@@ -98,7 +98,7 @@ const setupTimeSeries = (facts, opts) => {
   const container = d3.select(opts.container)
   const displayArea = container.append('div').classed('chart', true)
 
-  const timeSeriesPlotter = new ClassTimeSeriesPlotter({
+  const timeSeriesFilter = new ClassTimeSeriesFilter({
     groups,
     selector: `${opts.container} div.chart`,
   })
