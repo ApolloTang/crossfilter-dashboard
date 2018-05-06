@@ -93,7 +93,7 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   const container = d3.select(opts.container)
   const displayArea = container.append('div').classed('chart', true)
 
-  const dimension = window.d_date = facts.dimension( d=>d.date )
+  const dimension = facts.dimension( d=>d.date )
 
   const onDateRangeChangeCallBack = filterRange => {
     // _.debounce(()=>{
@@ -106,6 +106,7 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
 
   const _timeSeriesFilter = new ClassTimeSeriesFilter({
     data,
+    dimension,
     selector: `${opts.container} div.chart`,
     onDateRangeChangeCallBack
   })

@@ -2,16 +2,18 @@ export default class ClassTimeSeriesPlotter {
   constructor({
     width, height,
     selector,
-    data, dateName, dimensionName,
+    data, dimension,
+    dateName, dimensionName,
     onDateRangeChangeCallBack
   }) {
-    this.width_container = width || 600
+    this.width_container = width || 1000
     this.height_container = height || 200
     this.selector = selector
 
     this.dateName = dateName || '_date'
     this.dimensionName = dimensionName || 'total'
     this.data = data
+    this.dimension = dimension
 
     this.onDateRangeChangeCallBack = onDateRangeChangeCallBack || function(selectedDomain) { console.log(selectedDomain) }
 
@@ -62,13 +64,15 @@ export default class ClassTimeSeriesPlotter {
   _calculateScales(data) {
     const dateName = this.dateName
     const dimensionName = this.dimensionName
+    const dimension = this.dimension
+    const extent = [dimension.bottom(1)[0][dateName], dimension.top(1)[0][dateName]]
 
     this.x = d3.scaleTime()
       .range([0, this.width])
-      .domain(d3.extent(data, function(d) { return d[dateName] }));
+      .domain(extent);
 
     this.y = d3.scaleLinear()
-      .range([this.height, 0])
+      .range([0, this.height])
       .domain([0, d3.max(data, function(d) { return d[dimensionName] })]);
   }
 
@@ -88,15 +92,15 @@ export default class ClassTimeSeriesPlotter {
       .append('rect')
 
     bars
+      .attr('data-id', d=>d.id)
+      .attr('data-total', d=>d[dimensionName])
       .attr('transform', d=>{
         const pt_x = x(d[dateName]);
-        // const pt_y = 0;
         const pt_y = this.height - y( d[dimensionName]);
         return `translate(${pt_x}, ${pt_y})`;
       })
       .styles({
-        // width: this.x.bandwidth(),
-        width: 4,
+        width: 1,
         stroke: 'red',
         fill: 'hsl(4, 77%, 34%)'
       })
