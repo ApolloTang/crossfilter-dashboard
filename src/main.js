@@ -1,5 +1,5 @@
 import ClassPiePlotter  from './ClassPiePlotter.js'
-import ClassTimeSeriesFilter from './class-timeseries-filter.js'
+import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
 
 
 var dispatch = d3.dispatch('load', 'filterChanged');
