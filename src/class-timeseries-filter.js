@@ -1,11 +1,15 @@
 export default class ClassTimeSeriesPlotter {
   constructor({
     width, height,
-    groups, selector
+    selector,
+    data, groups,
   }) {
     this.width_container = width || 600
     this.height_container = height || 200
+
+    this.data = data
     this.groups = groups
+
     this.selector = selector
 
     this._initPlot()
@@ -17,10 +21,12 @@ export default class ClassTimeSeriesPlotter {
     const selector =this.selector
 
     this._setupStage()
-    this._setupFilter()
 
-    // inject data from group
-    // this._calculateScalesDomain(this.group)
+    this._calculateScalesRange(this.data)
+    this._drawAreaPlot(this.data)
+
+    // this._setupFilter()
+
   }
 
   _setupStage () {
@@ -43,11 +49,13 @@ export default class ClassTimeSeriesPlotter {
     this.stage = svg.append('g')
       .attr('class', 'focus')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+    this.stage
       .append('rect')
       .attr('class', 'plot-area-background')
       .attr('width', width)
       .attr('height', height)
-      .attr('fill', 'blue');
+      .attr('fill', 'hsla(0, 50%, 90%, .4)');
   }
 
   _setupFilter() {
@@ -56,18 +64,28 @@ export default class ClassTimeSeriesPlotter {
       .on("brush end", this._handleBrushed);
   }
 
-  _calculateScalesRange() {
-    this.x = d3.scaleTime().range([0, this.width]),
-    this.y_focus = d3.scaleLinear().range([this.height_focus, 0]),
-    this.y_context = d3.scaleLinear().range([this.height_context, 0]);
+  _calculateScalesRange(data) {
+    this.x = d3.scaleTime()
+      .range([0, this.width])
+      .domain(d3.extent(data, function(d) { return d.date }));
+
+    this.y = d3.scaleLinear()
+      .range([this.height, 0])
+      .domain([0, d3.max(data, function(d) { return d.total })]);
   }
 
-  update() {
-    this._calculateScalesRange()
+  _drawAreaPlot(data) {
+    const area = window.area = d3.area()
+      .curve(d3.curveMonotoneX)
+      .x(d=>this.x(d.date))
+      .y0(this.height)
+      .y1(d=>this.y(d.total))
 
-  }
-
-  _calculateScalesDomain() {
+    this.stage
+      .append('path')
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", area);
   }
 
   _handleBrushed() {

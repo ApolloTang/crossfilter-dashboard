@@ -88,7 +88,7 @@ const setupPie = (facts, opts) => {
 }
 
 
-const setupTimeSeries = (facts, opts) => {
+const setupTimeSeriesFilter = (data, facts, opts) => {
   const dimension = facts.dimension(d=>d[opts.dimensionName])
   const dimensionGroup = dimension.group()
 
@@ -99,7 +99,7 @@ const setupTimeSeries = (facts, opts) => {
   const displayArea = container.append('div').classed('chart', true)
 
   const timeSeriesFilter = new ClassTimeSeriesFilter({
-    groups,
+    data,
     selector: `${opts.container} div.chart`,
   })
 
@@ -118,13 +118,9 @@ d3.json('./data.json', (er, data)=>{
 
   const facts = crossfilter(data)
 
-  const timeSeries = setupTimeSeries(facts, {
+  const timeSeriesfilter = setupTimeSeriesFilter(data, facts, {
     container:'#time-series',
-    dimensionName:'date'
   });
-  dispatch.on('filterChanged.renderTimeSeries', () => {
-    timeSeries.update()
-  })
 
   const table = setupTable(facts)
   dispatch.on('filterChanged.renderTable', () => {
