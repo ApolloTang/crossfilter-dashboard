@@ -1,21 +1,28 @@
 import ClassPiePlotter  from './class-pie-plotter.js'
 import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
+import ClassTable from './class-table.js'
 
 
 var dispatch = d3.dispatch('filterChanged')
 
 
 const setupTable = (facts, opts={container:'#table'}) => {
-  const d_table = facts.dimension(d=>d.id)
-  const g_table = d_table.group()
-
   const container = d3.select(opts.container)
-  const table = d_table.top(Infinity)
-  const displayArea = container.append('div')
+  const displayArea = container.append('div').classed('data-table', true)
+
+  const dimension = facts.dimension(d=>d.id)
+  const dimensionGroup = dimension.group()
+
+
+  const dataTable = new ClassTable({
+    dataKeys: ['id', 'date', 'quantity', 'total', 'tip', 'type'],
+    selector: `${opts.container} div.data-table`,
+  })
+
 
   const update = () =>{
-    console.table(d_table.top(Infinity))
-    displayArea.text(JSON.stringify(table))
+    console.table(dimension.top(Infinity))
+    dataTable.update(dimension)
   }
   return { update }
 }
@@ -105,7 +112,6 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   }
 
   const _timeSeriesFilter = new ClassTimeSeriesFilter({
-    dimension,
     selector: `${opts.container} div.chart`,
     onDateRangeChangeCallBack
   })
