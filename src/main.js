@@ -4,6 +4,10 @@ import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
 
 var dispatch = d3.dispatch('load', 'filterChanged');
 
+function addMins(date, mins) {
+  const result = new Date(date)
+  result.setDate(result.getMinutes() + mins)
+}
 
 const setupTable = (facts, opts={container:'#table'}) => {
   const d_table = facts.dimension(d=>d.id)

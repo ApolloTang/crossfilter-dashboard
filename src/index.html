@@ -1,30 +1,26 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <title>Dashboard</title>
+  <title>Dashboard excercise</title>
   <style type="text/less">
   </style>
   <link rel="stylesheet/less" type="text/css" href="main.less">
 </head>
 <body>
-  <div class="chart">
-    Chart has not being loaded
-  </div>
-
   <div id="time-series"></div>
   <div id="quantity"></div>
   <div id="total"></div>
   <div id="table"></div>
 
-  <script src="http://localhost:9088/less/dist/less.js"></script>
-  <script src="http://localhost:9088/lodash.js"></script>
-  <script src="http://localhost:9088/crossfilter-v1.3.js"></script>
-  <script src="http://localhost:9088/print-filter.js"></script>
-  <script src="http://localhost:9088/d3/d3.js"></script>
-  <script src="http://localhost:9088/d3/d3-selection-multi.v1.js"></script>
+  <script src="./resources/less/dist/less.js"></script>
+  <script src="./resources/lodash.js"></script>
+  <script src="./resources/crossfilter-v1.3.js"></script>
+  <script src="./resources/print-filter.js"></script>
+  <script src="./resources/d3/d3.js"></script>
+  <script src="./resources/d3/d3-selection-multi.v1.js"></script>
   <script>
     const chart = d3.select('.chart');
-    chart.html(`
+    console.log(`
       d3: version ${d3.version} </br>
       _: version ${_.VERSION} </br>
       less: version ${less.version} </br>
