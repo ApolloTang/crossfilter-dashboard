@@ -158,6 +158,14 @@ d3.json('./data.json', (er, data)=>{
     table.update()
   })
 
+  const type = setupPie(facts, {
+    container:'#type',
+    dimensionName:'type'
+  })
+  dispatch.on('filterChanged.renderType', () => {
+    type.update()
+  })
+
   const total = setupPie(facts, {
     container:'#total',
     dimensionName:'total'
