@@ -1,4 +1,5 @@
 function addSeconds(date, seconds) {
+  // https://stackoverflow.com/questions/563406/add-days-to-javascript-date
   const result = new Date(date)
   result.setSeconds(result.getSeconds() + seconds)
   return result
@@ -229,6 +230,4 @@ export default class ClassTimeSeriesPlotter {
     // @TODO
   }
 }
-
-
 
