@@ -2,22 +2,22 @@ export default class ClassTimeSeriesPlotter {
   constructor({
     width, height,
     selector,
-    data, dimension,
     dateName, dimensionName,
     onDateRangeChangeCallBack
   }) {
-    this.width_container = width || 1000
+    this.width_container = width || 600
     this.height_container = height || 200
     this.selector = selector
 
     this.dateName = dateName || '_date'
     this.dimensionName = dimensionName || 'total'
-    this.data = data
-    this.dimension = dimension
 
     this.onDateRangeChangeCallBack = onDateRangeChangeCallBack || function(selectedDomain) { console.log(selectedDomain) }
 
     this._initPlot()
+
+    this._hasInitialized = false
+    this.areaBars = void 0
   }
 
   _initPlot () {
@@ -26,10 +26,16 @@ export default class ClassTimeSeriesPlotter {
 
     this._setupStage()
 
-    this._calculateScales(this.data)
-    this._drawBars(this.data)
+  }
 
-    this._setupBrush()
+  update(data, dimension) {
+    this._calculateScales(data, dimension)
+    this._drawBars(data, dimension)
+
+    if (!this.hasInitialized) {
+      this._setupBrush()
+      this.hasInitialized = true
+    }
   }
 
   _setupStage () {
@@ -61,11 +67,12 @@ export default class ClassTimeSeriesPlotter {
       .attr('fill', 'hsla(0, 50%, 90%, .4)');
   }
 
-  _calculateScales(data) {
+  _calculateScales(data, dimension) {
     const dateName = this.dateName
     const dimensionName = this.dimensionName
-    const dimension = this.dimension
-    const extent = [dimension.bottom(1)[0][dateName], dimension.top(1)[0][dateName]]
+
+    // const extent = [dimension.bottom(1)[0][dateName], dimension.top(1)[0][dateName]]
+    const extent = d3.extent(data, d=>d[dateName])
 
     this.x = d3.scaleTime()
       .range([0, this.width])
@@ -76,24 +83,37 @@ export default class ClassTimeSeriesPlotter {
       .domain([0, d3.max(data, function(d) { return d[dimensionName] })]);
   }
 
-  _drawBars(data) {
+  _drawBars(data, dimension) {
     const dateName = this.dateName
     const dimensionName = this.dimensionName
     const x = this.x
     const y = this.y
 
-    const areaBars = this.stage
-      .append('g')
+    const isExmpty_barsArea = this.stage.select('g.bars').empty();
 
-    const bars = areaBars
+    if (isExmpty_barsArea) {
+      this.areaBars = this.stage
+        .append('g')
+        .classed('bars', true)
+    }
+
+    const filteredData = dimension.top(Infinity)
+
+    const joined = this.areaBars
       .selectAll('rect')
-      .data(data)
-      .enter()
-      .append('rect')
+      .data(filteredData, d=>d.id)
 
-    bars
-      .attr('data-id', d=>d.id)
-      .attr('data-total', d=>d[dimensionName])
+
+    const bars = joined.enter()
+      .append('rect')
+      .attr('data-id', d=>{
+        const out = d.id
+        return out
+      })
+      .attr('data-total', d=>{
+        const out = d[dimensionName]
+        return out
+      })
       .attr('transform', d=>{
         const pt_x = x(d[dateName]);
         const pt_y = this.height - y( d[dimensionName]);
@@ -105,6 +125,8 @@ export default class ClassTimeSeriesPlotter {
         fill: 'hsl(4, 77%, 34%)'
       })
       .style('height', d=>y(d[dimensionName]))
+
+    const exited = joined.exit().remove()
   }
 
   _setupBrush() {
@@ -131,10 +153,6 @@ export default class ClassTimeSeriesPlotter {
         self.onDateRangeChangeCallBack(selectedDomain)
       }
     }
-  }
-
-  update(data) {
-    // @TODO
   }
 
   destroy() {

@@ -96,7 +96,7 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   const dimension = facts.dimension( d=>d.date )
 
   const onDateRangeChangeCallBack = filterRange => {
-    // _.debounce(()=>{
+    // _.debounce(()=>{  //@TODO where decounce does not work ????
       const filterRageInDateString = filterRange.map(d=>d.toISOString())
       console.log('filterRange: ', filterRange, filterRageInDateString)
       dimension.filterRange(filterRageInDateString)
@@ -105,14 +105,13 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   }
 
   const _timeSeriesFilter = new ClassTimeSeriesFilter({
-    data,
     dimension,
     selector: `${opts.container} div.chart`,
     onDateRangeChangeCallBack
   })
 
   const update = () =>{
-    _timeSeriesFilter.update()
+    _timeSeriesFilter.update(data, dimension)
   };
   return { update }
 }
@@ -135,8 +134,7 @@ d3.json('./data.json', (er, data)=>{
     dateName
   });
   dispatch.on('filterChanged.renderTimeSeries', () => {
-     //* no need to update timeSeries
-     // timeSeriesfilter.update()
+     timeSeriesfilter.update()
   })
 
   const table = setupTable(facts)
