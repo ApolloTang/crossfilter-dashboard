@@ -31,7 +31,6 @@ export default class ClassTimeSeriesPlotter {
     const selector =this.selector
 
     this._setupStage()
-
   }
 
   update(data, dimension) {
@@ -39,6 +38,7 @@ export default class ClassTimeSeriesPlotter {
 
     if (!this.hasInitialized) {
       this._drawUnfilteredBars(data)
+      this._setupAxes()
       this._setupBrush()
       this.hasInitialized = true
     }
@@ -47,7 +47,7 @@ export default class ClassTimeSeriesPlotter {
   }
 
   _setupStage () {
-    const margin = {top: 20, right: 20, bottom:20, left: 20}
+    const margin = {top: 15, right: 20, bottom:25, left: 40}
     const svg = d3
       .select(this.selector).append('svg')
       .attr('width', this.width_container)
@@ -84,6 +84,7 @@ export default class ClassTimeSeriesPlotter {
     // add temporal padding to time series
     extent[0] = addSeconds(extent[0], -20)
     extent[1] = addSeconds(extent[1], 20)
+    const domain_maxY = d3.max(data, function(d) { return d[dimensionName] }) * 1.1
 
     this.x = d3.scaleTime()
       .range([0, this.width])
@@ -91,7 +92,11 @@ export default class ClassTimeSeriesPlotter {
 
     this.y = d3.scaleLinear()
       .range([0, this.height])
-      .domain([0, d3.max(data, function(d) { return d[dimensionName] })]);
+      .domain([0, domain_maxY]);
+
+    this.y_axis = d3.scaleLinear()
+      .range([this.height, 0])
+      .domain([0, domain_maxY]);
   }
 
   _drawUnfilteredBars(data) {
@@ -196,6 +201,22 @@ export default class ClassTimeSeriesPlotter {
       .attr("class", originName)
       .call(brush)
       .call(brush.move, this.x.range());
+  }
+
+  _setupAxes() {
+    const xAxis = d3.axisBottom(this.x).ticks(10)
+    const yAxis = d3.axisLeft(this.y_axis).ticks(5)
+
+    this.stage
+      .append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + this.height + ")")
+      .call(xAxis);
+
+    this.stage
+      .append("g")
+      .attr("class", "axis axis--y")
+      .call(yAxis);
   }
 
   _handleBrushed(self) {
