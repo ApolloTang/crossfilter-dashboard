@@ -41,15 +41,15 @@ export default class ClassTable {
 
     const rows = join.enter()
       .append('tr')
-      .each(d=>{
-        const row = d3.select(this)
-        // @TODO investigate this
-        // what is 'this' ?
-        this.dataKeys.forEach(key=>{
-          // console.log(row)
-          // row.append('td')//.append(d.key)
-        })
-      })
+      // .each(d=>{
+      //   const row = d3.select(this)
+      //   // @TODO investigate this
+      //   // what is 'this' ?
+      //   this.dataKeys.forEach(key=>{
+      //     // console.log(row)
+      //     // row.append('td')//.append(d.key)
+      //   })
+      // })
 
     const cells = rows.selectAll('td')
       .data(row=>{

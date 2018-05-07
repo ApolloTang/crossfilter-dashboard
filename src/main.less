@@ -1,5 +1,8 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {padding-top: 80px;}
+  body {
+   padding-left:80px;
+  }
+
 
   .axis text {
     font: 10px sans-serif;
@@ -10,3 +13,34 @@
     stroke: #000;
     shape-rendering: crispEdges;
   }
+
+.container-legend {
+  .legend-rows {
+    .row {
+      height: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      .color {
+        padding: 0;
+        height: 10px;
+        width: 10px;
+      }
+      .label {
+        padding-left: 5px;
+        font-family: sans-serif;
+        font-size: 15px;
+      }
+    }
+  }
+}
+
+.pie-chart {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  .container-chart {
+    margin-right: 10px;
+  }
+}

@@ -1,7 +1,7 @@
 import ClassPiePlotter  from './class-pie-plotter.js'
 import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
 import ClassTable from './class-table.js'
-
+import ClassPieLegend from './class-pie-legend.js'
 
 var dispatch = d3.dispatch('filterChanged')
 
@@ -36,15 +36,18 @@ const setupPie = (facts, opts) => {
   let filter = d3.set(groups)
 
   const container = d3.select(opts.container)
-  groups.forEach(k=>{
-    container.append('button').text(k).on('click', ()=>{
-      filter.has(k) ? filter.remove(k) : filter.add(k)
-      dimension.filterFunction(g=>filter.has(g+''))
-      dispatch.call('filterChanged', {}, facts)
-    })
-  })
+
+  // groups.forEach(k=>{
+  //   container.append('button').text(k).on('click', ()=>{
+  //     filter.has(k) ? filter.remove(k) : filter.add(k)
+  //     dimension.filterFunction(g=>filter.has(g+''))
+  //     dispatch.call('filterChanged', {}, facts)
+  //   })
+  // })
+
   const total = dimensionGroup.all()
-  const display = container.append('div')
+  const container_chart = container.append('div').classed('container-chart', true)
+  const container_legend = container.append('div').classed('container-legend', true)
 
   console.log('xxxx initial filter', filter.values())
   const onClickCallback = (datum, index, currentNode, d3SelectPaths) => {
@@ -80,7 +83,13 @@ const setupPie = (facts, opts) => {
 
   const piePlotter = new ClassPiePlotter({
     groups,
-    selector: `${opts.container} div`,
+    selector: `${opts.container} div.container-chart`,
+    onClickCallback
+  })
+
+  const pieLegend = new ClassPieLegend({
+    groups,
+    selector: `${opts.container} div.container-legend`,
     onClickCallback
   })
 
@@ -90,7 +99,8 @@ const setupPie = (facts, opts) => {
       return acc
     }, {})
 
-    piePlotter.update( data)
+    piePlotter.update(data)
+    pieLegend.update(groups)
   }
   return { update }
 }
