@@ -1,3 +1,9 @@
+function addSeconds(date, seconds) {
+  const result = new Date(date)
+  result.setSeconds(result.getSeconds() + seconds)
+  return result
+}
+
 export default class ClassTimeSeriesPlotter {
   constructor({
     width, height,
@@ -73,8 +79,11 @@ export default class ClassTimeSeriesPlotter {
     const dateName = this.dateName
     const dimensionName = this.dimensionName
 
-    // const extent = [dimension.bottom(1)[0][dateName], dimension.top(1)[0][dateName]]
     const extent = d3.extent(data, d=>d[dateName])
+
+    // add temporal padding to time series
+    extent[0] = addSeconds(extent[0], -20)
+    extent[1] = addSeconds(extent[1], 20)
 
     this.x = d3.scaleTime()
       .range([0, this.width])
