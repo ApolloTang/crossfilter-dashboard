@@ -1,13 +1,9 @@
-import ClassPiePlotter  from './ClassPiePlotter.js'
+import ClassPiePlotter  from './class-pie-plotter.js'
 import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
 
 
-var dispatch = d3.dispatch('load', 'filterChanged');
+var dispatch = d3.dispatch('filterChanged')
 
-function addMins(date, mins) {
-  const result = new Date(date)
-  result.setDate(result.getMinutes() + mins)
-}
 
 const setupTable = (facts, opts={container:'#table'}) => {
   const d_table = facts.dimension(d=>d.id)
@@ -20,7 +16,7 @@ const setupTable = (facts, opts={container:'#table'}) => {
   const update = () =>{
     console.table(d_table.top(Infinity))
     displayArea.text(JSON.stringify(table))
-  };
+  }
   return { update }
 }
 
@@ -36,7 +32,7 @@ const setupPie = (facts, opts) => {
   groups.forEach(k=>{
     container.append('button').text(k).on('click', ()=>{
       filter.has(k) ? filter.remove(k) : filter.add(k)
-      dimension.filterFunction(g=>filter.has(g+""))
+      dimension.filterFunction(g=>filter.has(g+''))
       dispatch.call('filterChanged', {}, facts)
     })
   })
@@ -69,7 +65,7 @@ const setupPie = (facts, opts) => {
     console.log('xxxx after click filter', filter.values())
 
     dimension.filterFunction(g=>{
-      return filter.has(g+"")
+      return filter.has(g+'')
     })
 
     dispatch.call('filterChanged', {}, facts)
@@ -84,11 +80,11 @@ const setupPie = (facts, opts) => {
   const update = () =>{
     const data = total.reduce((acc, d)=>{
       acc[d.key] = d.value
-      return acc;
+      return acc
     }, {})
 
     piePlotter.update( data)
-  };
+  }
   return { update }
 }
 
@@ -116,13 +112,13 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
 
   const update = () =>{
     _timeSeriesFilter.update(data, dimension)
-  };
+  }
   return { update }
 }
 
 
 d3.json('./data.json', (er, data)=>{
-  if (er) throw er;
+  if (er) throw er
 
   const dateName = '_date'
   data.forEach(d=>{
@@ -136,7 +132,7 @@ d3.json('./data.json', (er, data)=>{
     container:'#time-series',
     dimensionName:'total',
     dateName
-  });
+  })
   dispatch.on('filterChanged.renderTimeSeries', () => {
      timeSeriesfilter.update()
   })
@@ -149,7 +145,7 @@ d3.json('./data.json', (er, data)=>{
   const total = setupPie(facts, {
     container:'#total',
     dimensionName:'total'
-  });
+  })
   dispatch.on('filterChanged.renderTotal', () => {
     total.update()
   })
@@ -157,7 +153,7 @@ d3.json('./data.json', (er, data)=>{
   const quantity = setupPie(facts, {
     container:'#quantity',
     dimensionName:'quantity'
-  });
+  })
   dispatch.on('filterChanged.renderQuantity', () => {
     quantity.update()
   })

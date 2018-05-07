@@ -57,12 +57,6 @@ export default class ClassTimeSeriesPlotter {
     const width  = this.width  = +svg.attr('width')  - margin.left - margin.right
     const height = this.height = +svg.attr('height') - margin.top  - margin.bottom
 
-    svg.append('defs').append('clipPath')
-      .attr('id', 'clip')
-      .append('rect')
-      .attr('width', width)
-      .attr('height', height);
-
     this.stage = svg.append('g')
       .attr('class', 'bar-chart')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
@@ -72,7 +66,7 @@ export default class ClassTimeSeriesPlotter {
       .attr('class', 'plot-area-background')
       .attr('width', width)
       .attr('height', height)
-      .attr('fill', 'hsla(0, 50%, 90%, .4)');
+      .attr('fill', 'hsla(0, 50%, 90%, .4)')
   }
 
   _calculateScales(data, dimension) {
@@ -82,21 +76,21 @@ export default class ClassTimeSeriesPlotter {
     const extent = d3.extent(data, d=>d[dateName])
 
     // add temporal padding to time series
-    extent[0] = addSeconds(extent[0], -20)
-    extent[1] = addSeconds(extent[1], 20)
+    extent[0] = addSeconds(extent[0], -30)
+    extent[1] = addSeconds(extent[1], 30)
     const domain_maxY = d3.max(data, function(d) { return d[dimensionName] }) * 1.1
 
     this.x = d3.scaleTime()
       .range([0, this.width])
-      .domain(extent);
+      .domain(extent)
 
     this.y = d3.scaleLinear()
       .range([0, this.height])
-      .domain([0, domain_maxY]);
+      .domain([0, domain_maxY])
 
     this.y_axis = d3.scaleLinear()
       .range([this.height, 0])
-      .domain([0, domain_maxY]);
+      .domain([0, domain_maxY])
   }
 
   _drawUnfilteredBars(data) {
@@ -105,9 +99,9 @@ export default class ClassTimeSeriesPlotter {
     const x = this.x
     const y = this.y
 
-    const isExmpty_barsArea = this.stage.select('g.bars-unfiltered').empty();
+    const isExmpty_barsArea = this.stage.select('g.bars-unfiltered').empty()
 
-    let areaBars_unfiltered;
+    let areaBars_unfiltered
     if (isExmpty_barsArea) {
       areaBars_unfiltered = this.stage
         .append('g')
@@ -129,9 +123,9 @@ export default class ClassTimeSeriesPlotter {
         return out
       })
       .attr('transform', d=>{
-        const pt_x = x(d[dateName]);
-        const pt_y = this.height - y( d[dimensionName]);
-        return `translate(${pt_x}, ${pt_y})`;
+        const pt_x = x(d[dateName])
+        const pt_y = this.height - y( d[dimensionName])
+        return `translate(${pt_x}, ${pt_y})`
       })
       .styles({
         width: 1,
@@ -149,7 +143,7 @@ export default class ClassTimeSeriesPlotter {
     const x = this.x
     const y = this.y
 
-    const isExmpty_barsArea = this.stage.select('g.bars').empty();
+    const isExmpty_barsArea = this.stage.select('g.bars').empty()
 
     if (isExmpty_barsArea) {
       this.areaBars = this.stage
@@ -175,9 +169,9 @@ export default class ClassTimeSeriesPlotter {
         return out
       })
       .attr('transform', d=>{
-        const pt_x = x(d[dateName]);
-        const pt_y = this.height - y( d[dimensionName]);
-        return `translate(${pt_x}, ${pt_y})`;
+        const pt_x = x(d[dateName])
+        const pt_y = this.height - y( d[dimensionName])
+        return `translate(${pt_x}, ${pt_y})`
       })
       .styles({
         width: 1,
@@ -192,15 +186,15 @@ export default class ClassTimeSeriesPlotter {
   _setupBrush() {
     const brush = this.brush = d3.brushX()
       .extent([[0, 0], [this.width, this.height]])
-      .on("brush end", this._handleBrushed(this));
+      .on('brush end', this._handleBrushed(this))
 
     const originName = this.originName = 'brush brush__time-filter'
 
     this.stage
-      .append("g")
-      .attr("class", originName)
+      .append('g')
+      .attr('class', originName)
       .call(brush)
-      .call(brush.move, this.x.range());
+      .call(brush.move, this.x.range())
   }
 
   _setupAxes() {
@@ -208,20 +202,20 @@ export default class ClassTimeSeriesPlotter {
     const yAxis = d3.axisLeft(this.y_axis).ticks(5)
 
     this.stage
-      .append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + this.height + ")")
-      .call(xAxis);
+      .append('g')
+      .attr('class', 'axis axis--x')
+      .attr('transform', 'translate(0,' + this.height + ')')
+      .call(xAxis)
 
     this.stage
-      .append("g")
-      .attr("class", "axis axis--y")
-      .call(yAxis);
+      .append('g')
+      .attr('class', 'axis axis--y')
+      .call(yAxis)
   }
 
   _handleBrushed(self) {
     return (g) => {
-      const fullRange = self.x.range();
+      const fullRange = self.x.range()
       const selectedRange = d3.event.selection || fullRange
       const originName = _.get(d3.event.sourceEvent, `path[1].className.baseVal`, void 0)
       if (originName === self.originName) {
