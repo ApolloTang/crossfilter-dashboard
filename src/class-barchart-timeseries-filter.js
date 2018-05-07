@@ -30,12 +30,14 @@ export default class ClassTimeSeriesPlotter {
 
   update(data, dimension) {
     this._calculateScales(data, dimension)
-    this._drawBars(data, dimension)
 
     if (!this.hasInitialized) {
+      this._drawUnfilteredBars(data)
       this._setupBrush()
       this.hasInitialized = true
     }
+
+    this._drawBars(data, dimension)
   }
 
   _setupStage () {
@@ -81,6 +83,50 @@ export default class ClassTimeSeriesPlotter {
     this.y = d3.scaleLinear()
       .range([0, this.height])
       .domain([0, d3.max(data, function(d) { return d[dimensionName] })]);
+  }
+
+  _drawUnfilteredBars(data) {
+    const dateName = this.dateName
+    const dimensionName = this.dimensionName
+    const x = this.x
+    const y = this.y
+
+    const isExmpty_barsArea = this.stage.select('g.bars-unfiltered').empty();
+
+    let areaBars_unfiltered;
+    if (isExmpty_barsArea) {
+      areaBars_unfiltered = this.stage
+        .append('g')
+        .classed('bars-unfiltered', true)
+    }
+
+    const joined = areaBars_unfiltered
+      .selectAll('rect')
+      .data(data, d=>d.id)
+
+    const bars = joined.enter()
+      .append('rect')
+      .attr('data-id', d=>{
+        const out = d.id
+        return out
+      })
+      .attr('data-total', d=>{
+        const out = d[dimensionName]
+        return out
+      })
+      .attr('transform', d=>{
+        const pt_x = x(d[dateName]);
+        const pt_y = this.height - y( d[dimensionName]);
+        return `translate(${pt_x}, ${pt_y})`;
+      })
+      .styles({
+        width: 1,
+        stroke: 'hsla(0, 0%, 50%, .3)',
+        fill: 'hsla(0, 0%, 50%, .3)'
+      })
+      .style('height', d=>y(d[dimensionName]))
+
+    const exited = joined.exit().remove()
   }
 
   _drawBars(data, dimension) {
