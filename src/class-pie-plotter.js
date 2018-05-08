@@ -71,7 +71,6 @@ export default class ClassPiePlotter {
   }
 
   update(data) {
-    const d = data
     const pie = this._getPieLayout()
     const arc = this._getArc()
 
@@ -79,23 +78,19 @@ export default class ClassPiePlotter {
 
     const arcsLayout = pie.value(
       function(g) {
-        // console.log(d, data)
-        const out = d[g]
-        // console.log(g, out)
+        const out = data[g]
         return out
       }
     )(groups)
-    // console.log('arcs: ', arcsLayout)
 
     this.paths
       .data(arcsLayout)
       .transition().duration(1000)
-      .attrTween("d", function(d) {
+      .attrTween('d', function(d) {
         var interpolate = d3.interpolate(this._current, d)
         this._current = interpolate(0)
         return step => {
           const out = arc(interpolate(step))
-          // console.log(step, out)
           return out
         }
       })
