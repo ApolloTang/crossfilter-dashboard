@@ -13,11 +13,11 @@ export default class ClassPieLegend {
     this._setupStage()
   }
 
-  update(groups) {
+  update(groups, filter) {
     if (!this.hasInitialized) {
       this.hasInitialized = true
     }
-    this._renderRows(groups)
+    this._renderRows(groups, filter)
   }
 
   _setupStage () {
@@ -32,11 +32,12 @@ export default class ClassPieLegend {
     return color
   }
 
-  _renderRows(groups) {
+  _renderRows(groups, filter) {
     const colors = this._getColor(groups)
     const join = this.rowsContainer
       .selectAll('div')
-      .data(groups, d=>d)
+      .data(groups, d=>_.uniqueId())
+    join.exit().remove()
 
     const rows = join.enter()
       .append('div')
@@ -44,10 +45,15 @@ export default class ClassPieLegend {
       .on('click', d=>{console.log('click: ', d)})
 
     const cells = rows.selectAll('div')
-      .data( cellData=>[
-        {className: 'color', hexColor: colors(cellData)},
-        {className: 'label', text: cellData}
-      ])
+      .data( cellData=>{
+        const out = [
+          {data: cellData, className: 'filter'},
+          {data: cellData, className: 'color', hexColor: colors(cellData)},
+          {data: cellData, className: 'label', text: cellData}
+        ]
+        out.data = cellData
+        return out
+      })
       .enter()
       .append('div')
       .classed('color', d=>d.className === 'color')
@@ -56,7 +62,20 @@ export default class ClassPieLegend {
         if (d.hexColor) return d.hexColor
         return false
       })
-      .text(d=>(d.text) ? d.text : '')
+      .html(d=>{
+        switch(d.className) {
+          case 'filter': {
+            const checked = (filter.has(d.data+'')) ? 'checked' : ''
+            return `<input type="checkbox" ${checked}>`
+          }
+          case 'color': {
+            return ''
+          }
+          case 'label': {
+            return d.text
+          }
+        }
+      })
   }
 
   destroy() {

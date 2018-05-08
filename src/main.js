@@ -100,7 +100,7 @@ const setupPie = (facts, opts) => {
     }, {})
 
     piePlotter.update(data)
-    pieLegend.update(groups)
+    pieLegend.update(groups, filter)
   }
   return { update }
 }
