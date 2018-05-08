@@ -40,6 +40,15 @@ const setupPie = (facts, opts) => {
   const total = dimensionGroup.all()
   const container_chart = container.append('div').classed('container-chart', true)
   const container_legend = container.append('div').classed('container-legend', true)
+  const control = container_legend.append('div').classed('container-control', true).text('reset')
+  control.on('click', ()=>{
+    console.log('reset click')
+    filter = d3.set(groups)
+    dimension.filterFunction(g=>{
+      return filter.has(g+'')
+    })
+    dispatch.call('filterChanged', {}, facts)
+  })
 
   console.log('xxxx initial filter', filter.values())
   const onClickCallback = (datum, index, currentNode, d3SelectPaths) => {
