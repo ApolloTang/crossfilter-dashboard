@@ -40,8 +40,8 @@ const setupPie = (facts, opts) => {
   const total = dimensionGroup.all()
   const container_chart = container.append('div').classed('container-chart', true)
   const container_legend = container.append('div').classed('container-legend', true)
-  const control = container_legend.append('div').classed('container-control', true).text('reset')
-  control.on('click', ()=>{
+  const reset = container_legend.append('div').classed('reset', true).text('reset')
+  reset.on('click', ()=>{
     console.log('reset click')
     filter = d3.set(groups)
     dimension.filterFunction(g=>{
