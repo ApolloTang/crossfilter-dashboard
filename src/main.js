@@ -3,8 +3,7 @@ import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
 import ClassTable from './class-table.js'
 import ClassPieLegend from './class-pie-legend.js'
 
-var dispatch = d3.dispatch('filterChanged')
-
+const dispatch = d3.dispatch('filterChanged')
 
 const setupTable = (facts, opts={container:'#table'}) => {
   const container = d3.select(opts.container)
@@ -13,12 +12,10 @@ const setupTable = (facts, opts={container:'#table'}) => {
   const dimension = facts.dimension(d=>d.id)
   const dimensionGroup = dimension.group()
 
-
   const dataTable = new ClassTable({
     dataKeys: ['id', 'date', 'quantity', 'total', 'tip', 'type'],
     selector: `${opts.container} div.data-table`,
   })
-
 
   const update = () =>{
     console.table(dimension.top(Infinity))
@@ -40,15 +37,17 @@ const setupPie = (facts, opts) => {
   const total = dimensionGroup.all()
   const container_chart = container.append('div').classed('container-chart', true)
   const container_legend = container.append('div').classed('container-legend', true)
-  const reset = container_legend.append('div').classed('reset', true).text('reset')
-  reset.on('click', ()=>{
+  const resetButton = container_legend.append('div').classed('reset', true).text('reset')
+
+  const reset = () =>{
     console.log('reset click')
     filter = d3.set(groups)
     dimension.filterFunction(g=>{
       return filter.has(g+'')
     })
     dispatch.call('filterChanged', {}, facts)
-  })
+  }
+  resetButton.on('click', reset)
 
   console.log('xxxx initial filter', filter.values())
   const onClickCallback = (datum, index, currentNode, d3SelectPaths) => {
@@ -127,7 +126,7 @@ const setupPie = (facts, opts) => {
     piePlotter.update(data)
     pieLegend.update(groups, filter)
   }
-  return { update }
+  return { update, reset }
 }
 
 
@@ -208,6 +207,12 @@ d3.json('./data.json', (er, data)=>{
   })
 
   dispatch.call('filterChanged', {}, facts)
+
+  window.reset = () => {
+    total.reset()
+    type.reset()
+    quantity.reset()
+  }
 })
 
 
