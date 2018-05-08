@@ -34,6 +34,16 @@ export default class ClassTimeSeriesPlotter {
     this._setupStage()
   }
 
+  resetFilter(data, dimension) {
+    this._calculateScales(data, dimension)
+
+    const fullRange = this.x.range()
+    const selectedDomain_full = fullRange.map(this.x.invert)
+    this.onDateRangeChangeCallBack(selectedDomain_full)
+
+    this.g_brush.call(this.brush.move, fullRange)
+  }
+
   update(data, dimension) {
     this._calculateScales(data, dimension)
 
@@ -191,10 +201,11 @@ export default class ClassTimeSeriesPlotter {
 
     const originName = this.originName = 'brush brush__time-filter'
 
-    this.stage
+    this.g_brush = this.stage
       .append('g')
       .attr('class', originName)
-      .call(brush)
+
+    this.g_brush.call(brush)
       .call(brush.move, this.x.range())
   }
 

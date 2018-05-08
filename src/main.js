@@ -131,10 +131,13 @@ const setupPie = (facts, opts) => {
 
 
 const setupTimeSeriesFilter = (data, facts, opts) => {
+  const dimension = facts.dimension( d=>d.date )
+
   const container = d3.select(opts.container)
   const displayArea = container.append('div').classed('chart', true)
+  const control = container.append('div').classed('control', true)
 
-  const dimension = facts.dimension( d=>d.date )
+  const resetButton = control.append('div').classed('reset', true).text('reset')
 
   const onDateRangeChangeCallBack = filterRange => {
     // _.debounce(()=>{  //@TODO where decounce does not work ????
@@ -148,6 +151,10 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   const _timeSeriesFilter = new ClassTimeSeriesFilter({
     selector: `${opts.container} div.chart`,
     onDateRangeChangeCallBack
+  })
+
+  resetButton.on('click', ()=>{
+    _timeSeriesFilter.resetFilter(data,dimension)
   })
 
   const update = () =>{
