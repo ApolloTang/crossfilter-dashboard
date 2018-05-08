@@ -89,7 +89,7 @@ export default class ClassPiePlotter {
 
     this.paths
       .data(arcsLayout)
-      .transition().duration(2000)
+      .transition().duration(1000)
       .attrTween("d", function(d) {
         var interpolate = d3.interpolate(this._current, d)
         this._current = interpolate(0)

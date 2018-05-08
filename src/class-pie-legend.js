@@ -1,12 +1,14 @@
 export default class ClassPieLegend {
   constructor({
     selector,
-    color
+    color,
+    onLegendClickCallback
   }) {
     this.selector = selector
     this._init()
     this._hasInitialized = false
     this.color = color || d3.schemeCategory10
+    this.onLegendClickCallback = onLegendClickCallback
   }
 
   _init () {
@@ -42,7 +44,7 @@ export default class ClassPieLegend {
     const rows = join.enter()
       .append('div')
       .classed('row', true)
-      .on('click', d=>{console.log('click: ', d)})
+      .on('click', d=>{this.onLegendClickCallback(d)})
 
     const cells = rows.selectAll('div')
       .data( cellData=>{
@@ -58,6 +60,7 @@ export default class ClassPieLegend {
       .append('div')
       .classed('color', d=>d.className === 'color')
       .classed('label', d=>d.className === 'label')
+      .classed('filter', d=>d.className === 'filter')
       .style('background-color', d=>{
         if (d.hexColor) return d.hexColor
         return false
@@ -65,8 +68,10 @@ export default class ClassPieLegend {
       .html(d=>{
         switch(d.className) {
           case 'filter': {
-            const checked = (filter.has(d.data+'')) ? 'checked' : ''
-            return `<input type="checkbox" ${checked}>`
+            if (filter.has(d.data+'')) {
+              return '✓'
+            }
+            return '☐'
           }
           case 'color': {
             return ''

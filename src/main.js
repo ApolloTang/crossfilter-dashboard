@@ -37,14 +37,6 @@ const setupPie = (facts, opts) => {
 
   const container = d3.select(opts.container)
 
-  // groups.forEach(k=>{
-  //   container.append('button').text(k).on('click', ()=>{
-  //     filter.has(k) ? filter.remove(k) : filter.add(k)
-  //     dimension.filterFunction(g=>filter.has(g+''))
-  //     dispatch.call('filterChanged', {}, facts)
-  //   })
-  // })
-
   const total = dimensionGroup.all()
   const container_chart = container.append('div').classed('container-chart', true)
   const container_legend = container.append('div').classed('container-legend', true)
@@ -56,10 +48,10 @@ const setupPie = (facts, opts) => {
       if (filter.values().length === groups.length) {
         filter.clear()
         filter.add(groupClicked)
-        d3.select(currentNode).style('stroke', '#F00')
+        // d3.select(currentNode).style('stroke', '#F00')
       } else {
         filter.remove(groupClicked)
-        d3.select(currentNode).style('stroke', null)
+        // d3.select(currentNode).style('stroke', null)
       }
       if (filter.values().length === 0) {
         filter = d3.set(groups)
@@ -67,10 +59,34 @@ const setupPie = (facts, opts) => {
     } else {
       filter.add(groupClicked)
       if (filter.values().length === groups.length) {
-        d3SelectPaths.style('stroke', null)
+        // d3SelectPaths.style('stroke', null)
       } else {
-        d3.select(currentNode).style('stroke', '#F00')
+        // d3.select(currentNode).style('stroke', '#F00')
       }
+    }
+    console.log('xxxx after click filter', filter.values())
+
+    dimension.filterFunction(g=>{
+      return filter.has(g+'')
+    })
+
+    dispatch.call('filterChanged', {}, facts)
+  }
+
+  const onLegendClickCallback = groupClicked => {
+    console.log('xxxxxxxxxx: ', groupClicked)
+    if (filter.has(groupClicked)) {
+      if (filter.values().length === groups.length) {
+        filter.clear()
+        filter.add(groupClicked)
+      } else {
+        filter.remove(groupClicked)
+      }
+      if (filter.values().length === 0) {
+        filter = d3.set(groups)
+      }
+    } else {
+      filter.add(groupClicked)
     }
     console.log('xxxx after click filter', filter.values())
 
@@ -90,7 +106,7 @@ const setupPie = (facts, opts) => {
   const pieLegend = new ClassPieLegend({
     groups,
     selector: `${opts.container} div.container-legend`,
-    onClickCallback
+    onLegendClickCallback
   })
 
   const update = () =>{
