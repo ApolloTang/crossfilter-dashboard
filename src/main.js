@@ -161,7 +161,10 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   const update = () =>{
     _timeSeriesFilter.update(data, dimension)
   }
-  return { update }
+  return {
+    update,
+    reset: ()=>{_timeSeriesFilter.resetFilter(data, dimension)}
+  }
 }
 
 
@@ -217,9 +220,10 @@ d3.json('./data.json', (er, data)=>{
   dispatch.call('filterChanged', {}, facts)
 
   window.reset = () => {
-    // total.reset()
-    // type.reset()
-    // quantity.reset()
+    total.reset()
+    type.reset()
+    quantity.reset()
+    timeSeriesfilter.reset()
   }
 })
 
