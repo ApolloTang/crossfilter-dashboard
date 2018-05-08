@@ -42,9 +42,10 @@ const setupPie = (facts, opts) => {
   const reset = () =>{
     console.log('reset click')
     filter = d3.set(groups)
-    dimension.filterFunction(g=>{
-      return filter.has(g+'')
-    })
+    // dimension.filterFunction(g=>{
+    //   return filter.has(g+'')
+    // })
+    dimension.filterAll()
     dispatch.call('filterChanged', {}, facts)
   }
   resetButton.on('click', reset)
@@ -216,9 +217,9 @@ d3.json('./data.json', (er, data)=>{
   dispatch.call('filterChanged', {}, facts)
 
   window.reset = () => {
-    total.reset()
-    type.reset()
-    quantity.reset()
+    // total.reset()
+    // type.reset()
+    // quantity.reset()
   }
 })
 
