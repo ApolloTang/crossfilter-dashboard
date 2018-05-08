@@ -4,7 +4,7 @@ export default class ClassPiePlotter {
     groups, selector, color,
     onClickCallback
   }) {
-    this.size = size || 180
+    this.size = size || 130
     this.donutHoleSize = donutHoleSize || 0.5
     this.radius = this.size/2
     this.innerRadius = this.radius * this.donutHoleSize
