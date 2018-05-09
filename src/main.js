@@ -42,7 +42,8 @@ const setupTable = (facts, opts={container:'#table'}) => {
 
 
 const setupPie = (facts, opts) => {
-  const dimension = facts.dimension(d=>d[opts.dimensionName])
+  const dimensionName = opts.dimensionName
+  const dimension = facts.dimension(d=>d[dimensionName])
   const dimensionGroup = dimension.group()
 
   const groups = dimensionGroup.all().map(d=>d.key)
@@ -53,7 +54,7 @@ const setupPie = (facts, opts) => {
   const total = dimensionGroup.all()
   const container_chart = container.append('div').classed('container-chart', true)
   const container_legend = container.append('div').classed('container-legend', true)
-  const resetButton = container_legend.append('div').classed('reset', true).text('reset')
+  const resetButton = container_legend.append('div').classed('reset-button', true).text('reset')
 
   const reset = () =>{
     console.log('reset click')
@@ -63,7 +64,7 @@ const setupPie = (facts, opts) => {
   }
   resetButton.on('click', reset)
 
-  console.log('xxxx initial filter', filter.values())
+  console.log('initial filter:', filter.values())
   const onClickCallback = (datum, index, currentNode, d3SelectPaths) => {
     const groupClicked = datum.data
     if (filter.has(groupClicked)) {
@@ -86,7 +87,7 @@ const setupPie = (facts, opts) => {
         // d3.select(currentNode).style('stroke', '#F00')
       }
     }
-    console.log('xxxx after click filter', filter.values())
+    console.log('after click filter:', filter.values())
 
     dimension.filterFunction(g=>{
       return filter.has(g+'')
@@ -96,7 +97,7 @@ const setupPie = (facts, opts) => {
   }
 
   const onLegendClickCallback = groupClicked => {
-    console.log('xxxxxxxxxx: ', groupClicked)
+    console.log('group changed: ', groupClicked)
     if (filter.has(groupClicked)) {
       if (filter.values().length === groups.length) {
         filter.clear()
@@ -110,7 +111,7 @@ const setupPie = (facts, opts) => {
     } else {
       filter.add(groupClicked)
     }
-    console.log('xxxx after click filter', filter.values())
+    console.log('after click filter', filter.values())
 
     dimension.filterFunction(g=>{
       return filter.has(g+'')
@@ -122,7 +123,8 @@ const setupPie = (facts, opts) => {
   const piePlotter = new ClassPiePlotter({
     groups,
     selector: `${opts.container} div.container-chart`,
-    onClickCallback
+    onClickCallback,
+    dimensionName
   })
 
   const pieLegend = new ClassPieLegend({

@@ -2,7 +2,8 @@ export default class ClassPiePlotter {
   constructor({
     size, donutHoleSize,
     groups, selector, color,
-    onClickCallback
+    onClickCallback,
+    dimensionName
   }) {
     this.size = size || 130
     this.donutHoleSize = donutHoleSize || 0.5
@@ -13,6 +14,7 @@ export default class ClassPiePlotter {
     this.color = color || d3.schemeCategory10
 
     this.onClickCallback = onClickCallback || function(datum, index, nodes) { d3.select(nodes[0]).style('stroke', '#F00') }
+    this.dimensionName = dimensionName
 
     this._initPie()
   }
@@ -61,6 +63,11 @@ export default class ClassPiePlotter {
         this._current = {startAngle: 0, endAngle: 0} // initial tweening angle
         d3.select(this).on('click', that._handlePieSectionClick(that.paths) )
       })
+
+    svg.append('text').classed('pie-name', true)
+      .attr('transform', `translate(0, 4)`)
+      .style('text-anchor', 'middle')
+      .text(`${this.dimensionName}`)
   }
 
   _handlePieSectionClick(paths) {
