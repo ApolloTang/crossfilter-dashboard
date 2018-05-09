@@ -1,10 +1,20 @@
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-   font-family: sans-serif;
-   padding:20px;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+ font-family: sans-serif;
+ padding:20px;
+}
 
 
+.layout_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+// Time serie
+
+.component-time-series {
+  // chart
   .axis text {
     font: 10px sans-serif;
   }
@@ -14,7 +24,19 @@
     stroke: #000;
     shape-rendering: crispEdges;
   }
+  .y-axis-label, .x-axis-label {
+    font-size: 12px;
+    text-transform: capitalize;
+  }
 
+}
+
+
+///////////////
+// pie chart //
+///////////////
+
+// pie chart legend
 .container-legend {
   .reset {
     font-size: 13px;
@@ -44,6 +66,7 @@
   }
 }
 
+// pie chart
 .pie-chart {
   display: flex;
   flex-direction: row;
@@ -53,8 +76,12 @@
   }
 }
 
-.layout_row {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+////////////////
+// data table //
+////////////////
+#table {
+  .data-table {
+    width: 400px;
+    outline: solid red 1px;
+  }
 }

@@ -129,14 +129,12 @@ const setupPie = (facts, opts) => {
 
 
 const setupTimeSeriesFilter = (data, facts, opts) => {
-  const dimension = facts.dimension( d=>d.date )
-
   const container = d3.select(opts.container)
-  const displayArea = container.append('div').classed('chart', true)
-  const control = container.append('div').classed('control', true)
 
-  const resetButton = control.append('div').classed('reset', true).text('reset')
+  const componentName = 'component-time-series'
+  const componentWrapper = container.append('div').classed(componentName, true)
 
+  const dimension = facts.dimension( d=>d.date )
   const onDateRangeChangeCallBack = filterRange => {
     // _.debounce(()=>{  //@TODO where decounce does not work ????
       const filterRageInDateString = filterRange.map(d=>d.toISOString())
@@ -147,10 +145,12 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
   }
 
   const _timeSeriesFilter = new ClassTimeSeriesFilter({
-    selector: `${opts.container} div.chart`,
+    selector: `${opts.container} div.${componentName}`,
     onDateRangeChangeCallBack
   })
 
+  const controlWrapper = componentWrapper.append('div').classed('control', true)
+  const resetButton = controlWrapper.append('div').classed('reset', true).text('reset')
   resetButton.on('click', ()=>{
     _timeSeriesFilter.resetFilter(data,dimension)
   })
@@ -177,7 +177,7 @@ d3.json('./data.json', (er, data)=>{
   const facts = crossfilter(data)
 
   const timeSeriesfilter = setupTimeSeriesFilter(data, facts, {
-    container:'#time-series',
+    container:'#time-series-total',
     dimensionName:'total',
     dateName
   })

@@ -42,7 +42,7 @@ export default class ClassTable {
     //* http://bl.ocks.org/jfreels/6734025
     const join = this.tableBody
       .selectAll('tr')
-      .data(dimension.top(Infinity), d=>d.id)
+      .data(dimension.bottom(Infinity), d=>d.id)
 
     const rows = join.enter()
       .append('tr')

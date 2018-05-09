@@ -58,12 +58,15 @@ export default class ClassTimeSeriesPlotter {
   }
 
   _setupStage () {
-    const margin = {top: 15, right: 20, bottom:25, left: 40}
+    const dimensionName = this.dimensionName
+
+    const margin = {top: 15, right: 20, bottom:40, left: 45}
+
     const svg = d3
       .select(this.selector).append('svg')
       .attr('width', this.width_container)
       .attr('height', this.height_container)
-      .attr('style', 'outline: 1px solid red;')
+      .attr('style', 'outline: 1px solid red;') // @TODO remove
 
     const width  = this.width  = +svg.attr('width')  - margin.left - margin.right
     const height = this.height = +svg.attr('height') - margin.top  - margin.bottom
@@ -78,7 +81,24 @@ export default class ClassTimeSeriesPlotter {
       .attr('width', width)
       .attr('height', height)
       .attr('fill', 'hsla(0, 50%, 90%, .4)')
-  }
+
+    // text label for the y axis
+    this.stage.append('text')
+      .classed('y-axis-label', true)
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - margin.left)
+      .attr('x',0 - (height / 2))
+      .attr('dy', '1em')
+      .style('text-anchor', 'middle')
+      .text(dimensionName);
+
+    // text label for the x axis
+    svg.append('text')
+        .classed('x-axis-label', true)
+        .attr('transform', `translate( ${width/2+30} ,${height+margin.top+35})`)
+        .style('text-anchor', 'middle')
+        .text('Date');
+    }
 
   _calculateScales(data, dimension) {
     const dateName = this.dateName
