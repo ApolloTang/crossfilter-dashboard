@@ -129,6 +129,26 @@ body {
   outline: 1px solid hsl(0,0%,50%);
   height: 400px;
   .data-table {
-
+    padding: 5px;
+    width: 100%;
+    table {
+      width: 100%;
+      font-size: 13px;
+      border: 0px;
+      border-collapse:collapse;
+    }
+    thead, tbody {
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background-color: hsl(0,0%,96%);
+    }
+    thead {
+      border-bottom: hsl(0, 0%, 80%) 1px solid;
+      font-size: 11px;
+    }
+    td, th {
+      padding: 6px;
+    }
   }
 }
