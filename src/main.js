@@ -241,12 +241,18 @@ d3.json('./data.json', (er, data)=>{
 
   dispatch.call('filterChanged', {}, facts)
 
-  window.reset = () => {
+  const resetAll = window.reset = () => {
     total.reset()
     type.reset()
     quantity.reset()
     timeSeriesfilter.reset()
   }
+
+  const resetAllButton = d3.select('.global-control').append('div')
+    .classed('reset-all reset-button', true).text('reset all')
+  resetAllButton.on('click', resetAll)
+
+
 })
 
 

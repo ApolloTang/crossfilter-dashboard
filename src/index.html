@@ -7,17 +7,20 @@
   <link rel="stylesheet/less" type="text/css" href="main.less">
 </head>
 <body>
-  <div class="layout_row" >
-    <div id="time-series-total"></div>
-  </div>
-  <div class="layout_row" >
-    <div class="layout_column" >
-      <div id="quantity" class="pie-chart"></div>
-      <div id="type" class="pie-chart"></div>
-      <div id="total" class="pie-chart"></div>
+  <div class="app">
+    <div class="global-control"></div>
+    <div class="layout_row" >
+      <div id="time-series-total"></div>
     </div>
-    <div class="layout_column" >
-      <div id="table"></div>
+    <div class="layout_row" >
+      <div class="layout_column-left" >
+        <div id="quantity" class="pie-chart"></div>
+        <div id="type" class="pie-chart"></div>
+        <div id="total" class="pie-chart"></div>
+      </div>
+      <div class="layout_column-right" >
+        <div id="table"></div>
+      </div>
     </div>
   </div>
 

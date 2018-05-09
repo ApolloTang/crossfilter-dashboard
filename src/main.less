@@ -1,14 +1,35 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
  font-family: sans-serif;
- padding:20px;
 }
 
-
+.app {
+  padding-top: 5px;
+  width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.global-control {
+  height: 20px;
+  .reset-all {
+    float: right;
+  }
+}
 .layout_row {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
+}
+
+@column-left-width: 210px;
+.layout_column-left {
+  width: @column-left-width;
+  margin-right: 5px;
+}
+
+.layout_column-right {
+  padding-top: 5px;
+  width: 620px-@column-left-width;
 }
 
 .reset-button {
@@ -59,7 +80,7 @@ body {
   .legend-rows {
     padding-top:4px;
     .row {
-      height: 20px;
+      height: 17px;
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
@@ -84,6 +105,7 @@ body {
 
 // pie chart
 .pie-chart {
+  height: 130px;
   margin-top: 5px;
   outline: 1px solid hsl(0,0%,50%);
   padding: 10px;
@@ -92,7 +114,7 @@ body {
   flex-direction: row;
   justify-content: flex-start;
   .container-chart {
-    margin-right: 10px;
+    margin-right: 15px;
   }
   .pie-name {
     font-size: 12px;
@@ -104,8 +126,9 @@ body {
 // data table //
 ////////////////
 #table {
+  outline: 1px solid hsl(0,0%,50%);
+  height: 400px;
   .data-table {
-    width: 400px;
-    outline: solid red 1px;
+
   }
 }
