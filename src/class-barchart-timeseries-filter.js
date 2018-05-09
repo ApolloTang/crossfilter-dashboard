@@ -60,13 +60,12 @@ export default class ClassTimeSeriesPlotter {
   _setupStage () {
     const dimensionName = this.dimensionName
 
-    const margin = {top: 15, right: 20, bottom:40, left: 45}
+    const margin = {top: 0 , right: 20, bottom:40, left: 45}
 
     const svg = d3
       .select(this.selector).append('svg')
       .attr('width', this.width_container)
       .attr('height', this.height_container)
-      .attr('style', 'outline: 1px solid red;') // @TODO remove
 
     const width  = this.width  = +svg.attr('width')  - margin.left - margin.right
     const height = this.height = +svg.attr('height') - margin.top  - margin.bottom

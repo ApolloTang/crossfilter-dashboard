@@ -1,6 +1,6 @@
 
 function formatTime(date) {
-  return d3.timeFormat('%d, %H:%I:%M:%S')(date)
+  return d3.timeFormat('%b %d, %H:%M:%S')(date)
 }
 
 export default class ClassTable {

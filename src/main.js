@@ -3,6 +3,21 @@ import ClassTimeSeriesFilter from './class-barchart-timeseries-filter.js'
 import ClassTable from './class-table.js'
 import ClassPieLegend from './class-pie-legend.js'
 
+function formatTime(date) {
+  return d3.timeFormat('%H:%M:%S')(date)
+}
+
+function getFullDateRangeFormat_fromDimension(dimension) {
+  const bottom = formatTime(new Date(dimension.bottom(1)[0].date))
+  const top = formatTime(new Date(dimension.top(1)[0].date))
+  return `${bottom} - ${top}`
+}
+function getFullDateRangeFormat_fromFilterRangeInDateString(filterRangeInDateString) {
+  const bottom = formatTime(new Date(filterRangeInDateString[0]))
+  const top = formatTime(new Date(filterRangeInDateString[1]))
+  return `${bottom} - ${top}`
+}
+
 const dispatch = d3.dispatch('filterChanged')
 
 const setupTable = (facts, opts={container:'#table'}) => {
@@ -23,6 +38,7 @@ const setupTable = (facts, opts={container:'#table'}) => {
   }
   return { update }
 }
+
 
 
 const setupPie = (facts, opts) => {
@@ -128,6 +144,7 @@ const setupPie = (facts, opts) => {
 }
 
 
+
 const setupTimeSeriesFilter = (data, facts, opts) => {
   const container = d3.select(opts.container)
 
@@ -136,25 +153,31 @@ const setupTimeSeriesFilter = (data, facts, opts) => {
 
   const dimension = facts.dimension( d=>d.date )
   const onDateRangeChangeCallBack = filterRange => {
-    // _.debounce(()=>{  //@TODO where decounce does not work ????
-      const filterRageInDateString = filterRange.map(d=>d.toISOString())
-      console.log('filterRange: ', filterRange, filterRageInDateString)
-      dimension.filterRange(filterRageInDateString)
+    // _.debounce(()=>{  //@TODO why decounce does not work ????
+      const filterRangeInDateString = filterRange.map(d=>d.toISOString())
+      console.log('filterRange: ', filterRangeInDateString)
+      dimension.filterRange(filterRangeInDateString)
       dispatch.call('filterChanged', {}, facts)
+      componentWrapper
+        .select('.filter-range')
+        .text(`Filtered date range: ${getFullDateRangeFormat_fromFilterRangeInDateString(filterRangeInDateString)}`)
     // },300)
   }
+
+  const controlWrapper = componentWrapper.append('div').classed('control', true)
+  const displayFilterRangeWrapper = controlWrapper.append('div').classed('filter-range', true)
+    .text(`Filtered date range: ${ getFullDateRangeFormat_fromDimension(dimension) } `)
+  const resetButton = controlWrapper.append('div').classed('reset-button', true).text('reset')
 
   const _timeSeriesFilter = new ClassTimeSeriesFilter({
     selector: `${opts.container} div.${componentName}`,
     onDateRangeChangeCallBack
   })
 
-  const controlWrapper = componentWrapper.append('div').classed('control', true)
-  const resetButton = controlWrapper.append('div').classed('reset', true).text('reset')
+
   resetButton.on('click', ()=>{
     _timeSeriesFilter.resetFilter(data,dimension)
   })
-
   const update = () =>{
     _timeSeriesFilter.update(data, dimension)
   }
